@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CIT Global Sales Hub</title>
+    <style>
+        body { font-family: sans-serif; background: #f5f6f8; margin: 0; display: flex; }
+        .sidebar { width: 300px; background: #0d1b2a; color: white; height: 100vh; padding: 20px; position: fixed; }
+        .clock-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #e8a020; }
+        .clock-label { font-size: 10px; color: #a0aec0; font-weight: bold; }
+        .clock-time { font-size: 20px; font-weight: 700; font-family: monospace; color: white; }
+        .main { margin-left: 320px; padding: 30px; flex-grow: 1; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: #1e6fb5; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2 style="margin-bottom:20px;">🇦🇺 CIT Clock Wall</h2>
+    <div class="clock-box"><div class="clock-label">NSW/VIC/ACT (Sydney)</div><div id="c1" class="clock-time">--:--:--</div></div>
+    <div class="clock-box"><div class="clock-label">QLD (Brisbane)</div><div id="c2" class="clock-time">--:--:--</div></div>
+    <div class="clock-box"><div class="clock-label">SA (Adelaide)</div><div id="c3" class="clock-time">--:--:--</div></div>
+    <div class="clock-box"><div class="clock-label">NT (Darwin)</div><div id="c4" class="clock-time">--:--:--</div></div>
+    <div class="clock-box"><div class="clock-label">WA (Perth)</div><div id="c5" class="clock-time">--:--:--</div></div>
+    <div class="clock-box" style="border-left-color: #666;"><div class="clock-label">LOCAL (IST)</div><div id="c6" class="clock-time">--:--:--</div></div>
+</div>
+
+<div class="main">
+    <div class="card">
+        <h3>📝 Log Activity</h3>
+        <form id="f">
+            <label>Rep Name</label><input type="text" id="r" required>
+            <label>Client Name</label><input type="text" id="cl" required>
+            <label>Description Name</label><input type="text" id="d">
+            <label>Printer/Ink Details</label><input type="text" id="p" required>
+            <label>Status</label>
+            <select id="s">
+                <option value="SALE">SALE</option>
+                <option value="CALLBACK">CALLBACK</option>
+                <option value="FOLLOWUP">FOLLOW UP</option>
+                <option value="NOT_INTERESTED">NOT INTERESTED</option>
+            </select>
+            <label>Notes</label><textarea id="n"></textarea>
+            <button type="submit" id="b">Save to Google Sheet</button>
+        </form>
+        <p id="msg" style="text-align:center; font-weight:bold;"></p>
+    </div>
+</div>
+
+<script>
+    // CLOCK ENGINE
+    function t() {
+        const o = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
+        document.getElementById('c1').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Australia/Sydney' });
+        document.getElementById('c2').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Australia/Brisbane' });
+        document.getElementById('c3').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Australia/Adelaide' });
+        document.getElementById('c4').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Australia/Darwin' });
+        document.getElementById('c5').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Australia/Perth' });
+        document.getElementById('c6').innerText = new Date().toLocaleTimeString('en-US', { ...o, timeZone: 'Asia/Kolkata' });
+    }
+    setInterval(t, 1000); t();
+
+    // GOOGLE SYNC
+    const URL = "https://script.google.com/macros/s/AKfycbzRRtwAJcEXOh-PUFCrsd7HQSzuRN7kPdhINmAI1BsNcFc433aiL9popY5SWUW-FhAb/exec";
+    
+    document.getElementById('f').addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('b').innerText = "Syncing...";
+        const data = {
+            rep: document.getElementById('r').value,
+            client: document.getElementById('cl').value,
+            descName: document.getElementById('d').value,
+            details: document.getElementById('p').value,
+            type: document.getElementById('s').value,
+            notes: document.getElementById('n').value
+        };
+
+        fetch(URL, { method: 'POST', body: JSON.stringify(data) })
+        .then(() => {
+            document.getElementById('msg').innerHTML = "<span style='color:green'>✓ SUCCESS! Saved to Sheet</span>";
+            document.getElementById('b').innerText = "Save to Google Sheet";
+            document.getElementById('f').reset();
+        });
+    });
+</script>
+
+</body>
+</html>
