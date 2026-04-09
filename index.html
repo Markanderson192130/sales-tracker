@@ -86,7 +86,7 @@
         };
         fetch(URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
         .then(() => {
-            document.getElementById('msg').innerText = "✓ RECORD SAVED TO MASTER SHEET";
+            document.getElementById('msg').innerText = "✓ RECORD SAVED SUCCESSFULLY";
             document.getElementById('btn').innerText = "Save to Master Sheet";
             document.getElementById('f').reset();
             setTimeout(() => { document.getElementById('msg').innerText = ""; }, 5000);
